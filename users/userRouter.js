@@ -114,7 +114,6 @@ router.delete("/:id", validateUserId, (req, res) => {
   users
     .remove(req.user.id)
     .then(() => {
-      // throw new Error('artifitial error while deleting!');
       res.status(200).json({ message: "This user has been deleted" });
     })
     .catch(error => {
