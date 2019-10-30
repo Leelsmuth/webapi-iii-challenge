@@ -1,7 +1,7 @@
 const express = require("express");
 
 const users = require("./userDb");
-
+const posts = require("../posts/postDb");
 const router = express.Router();
 
 //custom middleware
@@ -56,18 +56,26 @@ router.post("/", validateUser, (req, res) => {
       res.status(201).json(user);
     })
     .catch(error => {
-      // log error to server
-      console.log(error);
       res.status(500).json({
         message: "Error adding the user: " + error.message
       });
     });
 });
 
-// router.post("/:id/posts", validateUserId, (req, res) => {
-//   let { id } = req.params;
-//   let post = users.getUserPosts(id);
-// });
+router.post("/:id/posts", validateUserId, (req, res) => {
+  let { id } = req.params;
+  let postBody = { ...req.body, user_id: id };
+  posts
+    .insert(postBody)
+    .then(post => {
+      res.status(201).json(post);
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: "we encountered an error while creating this post for the user"
+      });
+    });
+});
 
 router.get("/", (req, res) => {
   users
@@ -88,7 +96,19 @@ router.get("/:id", validateUserId, (req, res) => {
   res.json(req.user);
 });
 
-// router.get("/:id/posts", (req, res) => {});
+router.get("/:id/posts", validateUserId, (req, res) => {
+  users
+    .getUserPosts(req.params.id)
+    .then(posts => {
+      res.status(200).json(posts);
+    })
+    .catch(err => {
+      res.status(500).json({
+        message:
+          "encountered an error while retrieving the posts for the specified user"
+      });
+    });
+});
 
 router.delete("/:id", validateUserId, (req, res) => {
   users
