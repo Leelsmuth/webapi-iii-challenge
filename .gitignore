@@ -60,4 +60,5 @@ typings/
 # Mac files
 .DS_Store
 
+# vscode environment folder
 .vscode
